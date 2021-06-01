@@ -27,7 +27,7 @@ class SpaceTradersClientTerminal:
 
     def accountStatus(self):
         print("Loading account status...")
-        r = requests.get("%s/my/account" % URL, headers={'Authorization': token})
+        r = requests.get("%s/my/account" % URL, headers={'Authorization': self.token})
         content = json.loads(r.content.decode())
         self.username = content["user"]["username"]
         print("Here is your account status, " + self.username)
@@ -36,7 +36,7 @@ class SpaceTradersClientTerminal:
 
     def browseLoans(self):
         print("Loading available loans...")
-        r = requests.get("%s/types/loans" % URL, headers={'Authorization': token})
+        r = requests.get("%s/types/loans" % URL, headers={'Authorization': self.token})
         print("Here are all available loans for you to take, " + self.username)
         content = json.loads(r.content.decode())
         print(content["loans"])
@@ -47,7 +47,7 @@ class SpaceTradersClientTerminal:
         print("")
 
         print("Processing loan...")
-        r = requests.get("%s/my/loans" % URL, headers={'Authorization': token}, params=parameters)
+        r = requests.get("%s/my/loans" % URL, headers={'Authorization': self.token}, params=parameters)
         
         while (r.status_code == 422):
             print("Loan type invalid, please insert a valid loan type: ")
@@ -56,11 +56,33 @@ class SpaceTradersClientTerminal:
             print("")
 
             print("Processing loan...")
-            r = requests.get("%s/my/loans" % URL, headers={'Authorization': token}, params=parameters)
+            r = requests.get("%s/my/loans" % URL, headers={'Authorization': self.token}, params=parameters)
 
         print("Loan sucessfully taken, here is the corresponding info:")
         content = json.loads(r.content.decode())
         print(content)
+
+    def browseShips(self, system):
+        print("Loading ship listings in " + system)
+        r = requests.get("%s/systems/%s/ship-listings" % (URL, system), headers={'Authorization': self.token})
+        print("Here are all ships available for purchase, self.username")
+        content = json.loads(r.content.decode())
+        for ship in content["shipListings"]:
+            print(ship)
+
+    def buyShip(self, location, type):
+        parameters = {"location": location, "type": type}
+        print("Processing purchase...")
+        r = requests.get("%s/my/ships" % URL, headers={'Authorization': self.token}, params=parameters)
+
+        if (r.status_code == 422):
+            print("Invalid purchase, please verify location and type of ship and try again")
+            print("")
+        else:
+            print("Purchase successfull, " + self.username)
+            content = json.loads(r.content.decode())
+            print(content)
+            
 
 #------------------------------------------------------------------------------------------------
 
@@ -122,18 +144,22 @@ else: #Y
 terminal = SpaceTradersClientTerminal(token)
 
 print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
-command = input("")
+command = input("").split()
 print("")
 
 while (command != "EXIT"):
     if (command == "HELP"):
         print("I regret to inform that this terminal does not have a helpdesk module installed")
-    elif (command == "BROWSE LOANS"): 
+    elif (command == ["BROWSE", "LOANS"]): 
         terminal.browseLoans()
-    elif (command[:9] == "TAKE LOAN"): #TAKE LOAN $TYPE
-        terminal.takeLoan(command[10:])
+    elif (command[:1] == ["TAKE", "LOAN"]): #TAKE LOAN $TYPE
+        terminal.takeLoan(command[2])
+    elif (command[:1] == ["BROWSE", "SHIPS"]): #BROWSE SHIPS $SYSTEM
+        terminal.browseShips(command[2])
+    elif (command[:1] == ["BUY", "SHIP"]): #BUY SHIP $LOCATION $TYPE
+        terminal.buyShip(command[2], command[3])
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
-    command = input("")
+    command = input("").split()
     print("")
 #------------------------------------------------------------------------------------------------
