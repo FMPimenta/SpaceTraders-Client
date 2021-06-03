@@ -82,7 +82,20 @@ class SpaceTradersClientTerminal:
             print("Purchase successfull, " + self.username)
             content = json.loads(r.content.decode())
             print(content)
-            
+
+    def purchaseOrder(self, shipID, goodID, quantity):
+        parameters = {"shipId": shipID, "good": goodID, "quantity":quantity}
+        print("Placing purchase order...")
+        r = requests.get("%s/my/purchase-orders" % URL, headers={'Authorization': self.token}, params=parameters)
+
+        if (r.status_code == 422):
+            print("Invalid purchase order, please verify shipID, good and quantity and try again")
+            print("")
+        else:
+            print("Purchase successfull, " + self.username)
+            content = json.loads(r.content.decode())
+            print(content)
+
 
 #------------------------------------------------------------------------------------------------
 
@@ -152,12 +165,14 @@ while (command != "EXIT"):
         print("I regret to inform that this terminal does not have a helpdesk module installed")
     elif (command == ["BROWSE", "LOANS"]): 
         terminal.browseLoans()
-    elif (command[:1] == ["TAKE", "LOAN"]): #TAKE LOAN $TYPE
+    elif (command[:1] == ["TAKE", "LOAN"]):         #TAKE LOAN $TYPE
         terminal.takeLoan(command[2])
-    elif (command[:1] == ["BROWSE", "SHIPS"]): #BROWSE SHIPS $SYSTEM
+    elif (command[:1] == ["BROWSE", "SHIPS"]):      #BROWSE SHIPS $SYSTEM
         terminal.browseShips(command[2])
-    elif (command[:1] == ["BUY", "SHIP"]): #BUY SHIP $LOCATION $TYPE
+    elif (command[:1] == ["BUY", "SHIP"]):          #BUY SHIP $LOCATION $TYPE
         terminal.buyShip(command[2], command[3])
+    elif (command[:1] == ["PURCHASE"]):             #PURCHASE $SHIPID $GOODID $QUANTITY
+        terminal.purchaseOrder(command[2], command[3], command[4])
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
     command = input("").split()
