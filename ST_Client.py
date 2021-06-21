@@ -1,13 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#username: TheLegendaryTrader
-#token: 736730b1-cfee-4ce4-a20d-872861782934
-
-#ship id: ckpd45efh19150216s6cnqldmvt
-
-#username: FrankySnow3000
-#token: cbf3684b-6667-44c1-817f-e14dc581bab9
+#90d30c73-77cf-473f-817f-7316aaf76909
 
 #Imports
 import requests
@@ -42,8 +36,7 @@ class SpaceTradersClientTerminal:
         print(content["loans"])
 
     def takeLoan(self, type):
-        loanType = type
-        parameters = {"type": loanType}
+        parameters = {"type": type}
         print("")
 
         print("Processing loan...")
@@ -73,7 +66,7 @@ class SpaceTradersClientTerminal:
     def buyShip(self, location, type):
         parameters = {"location": location, "type": type}
         print("Processing purchase...")
-        r = requests.get("%s/my/ships" % URL, headers={'Authorization': self.token}, params=parameters)
+        r = requests.get("%s/my/ships" % URL, headers={'Authorization': self.token}, params=parameters)    
 
         if (r.status_code == 422):
             print("Invalid purchase, please verify location and type of ship and try again")
@@ -96,6 +89,16 @@ class SpaceTradersClientTerminal:
             content = json.loads(r.content.decode())
             print(content)
 
+    def browseMarket(self, location):
+        print("Downloading market data...")
+        r = requests.get("%s/locations/%s/marketplace" % (URL,location), headers={'Authorization': self.token})
+        
+        if (r.status_code == 200):
+            print("Market data obtained sucessfully:")
+            content = json.loads(r.content.decode())
+            print(content)
+        else:
+            print("Market data download failed")
 
 #------------------------------------------------------------------------------------------------
 
@@ -131,7 +134,7 @@ if registered == "N":
 
     content = json.loads(r.content.decode())
     token = "Bearer " + content["token"]
-    print("%s, your standard issue token is: %s" % (username, token))
+    print("%s, your standard issue token is: %s" % (username, content["token"]))
     print("Please save this token in a safe external memory device, as losing it means termination of access to your account")
     print("")
 else: #Y
@@ -160,19 +163,21 @@ print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
 command = input("").split()
 print("")
 
-while (command != "EXIT"):
+while (command[0] != 'EXIT'):
     if (command == "HELP"):
         print("I regret to inform that this terminal does not have a helpdesk module installed")
-    elif (command == ["BROWSE", "LOANS"]): 
+    elif (command == ["BROWSE", "LOANS"]):          #BROWSE LOAN
         terminal.browseLoans()
-    elif (command[:1] == ["TAKE", "LOAN"]):         #TAKE LOAN $TYPE
+    elif (command[:2] == ["TAKE", "LOAN"]):         #TAKE LOAN $TYPE
         terminal.takeLoan(command[2])
-    elif (command[:1] == ["BROWSE", "SHIPS"]):      #BROWSE SHIPS $SYSTEM
+    elif (command[:2] == ["BROWSE", "SHIPS"]):      #BROWSE SHIPS $SYSTEM
         terminal.browseShips(command[2])
-    elif (command[:1] == ["BUY", "SHIP"]):          #BUY SHIP $LOCATION $TYPE
+    elif (command[:2] == ["BUY", "SHIP"]):          #BUY SHIP $LOCATION $TYPE
         terminal.buyShip(command[2], command[3])
     elif (command[:1] == ["PURCHASE"]):             #PURCHASE $SHIPID $GOODID $QUANTITY
         terminal.purchaseOrder(command[2], command[3], command[4])
+    elif (command[:2] == ["BROWSE", "MARKET"]):     #BROWSE MARKET $LOCATION
+        terminal.browseMarket(command[2])
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
     command = input("").split()
