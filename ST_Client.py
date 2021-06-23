@@ -100,6 +100,19 @@ class SpaceTradersClientTerminal:
         else:
             print("Market data download failed")
 
+    def scanSystem(self, system):
+        print("Scanning system...")
+        r = requests.get("%s/systems/%s/locations" % (URL, system), headers={'Authorization': self.token})
+
+        if (r.status_code == 200):
+            print("System scan complete:")
+            content = json.loads(r.content.decode())
+            print(content)
+            print("")
+        else:
+            print("System scan failed, please verify the system symbol and try again")
+            print("")
+
 #------------------------------------------------------------------------------------------------
 
 #Main code
@@ -178,6 +191,8 @@ while (command[0] != 'EXIT'):
         terminal.purchaseOrder(command[2], command[3], command[4])
     elif (command[:2] == ["BROWSE", "MARKET"]):     #BROWSE MARKET $LOCATION
         terminal.browseMarket(command[2])
+    elif (command[:2] == ["SCAN", "SYSTEM"]):           #SCAN SYSTEM $SYSTEM
+        terminal.scanSystem(command[2])
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
     command = input("").split()
