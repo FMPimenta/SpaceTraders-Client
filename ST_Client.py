@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#90d30c73-77cf-473f-817f-7316aaf76909
+#01b79536-9550-4798-8375-11b18c0c5654
+
+#TEST
+#ae45d5d4-0e0f-4050-9195-cd4e3c6720b8
 
 #Imports
 import requests
@@ -10,6 +13,10 @@ import json
 
 #Globals
 URL = "https://api.spacetraders.io"
+COMMANDS = ["ACCOUNT INFO", "BROWSE LOANS", "TAKE LOAN $TYPE", 
+            "BROWSE SHIPS $SYSTEM", "BUY SHIP $LOCATION $TYPE", 
+            "PURCHASE $SHIPID $GOODID $QUANTITY", "BROWSE MARKET $LOCATION", 
+            "SCAN SYSTEM $SYSTEM"]
 #------------------------------------------------------------------------------------------------
 
 #Classes
@@ -18,6 +25,13 @@ class SpaceTradersClientTerminal:
     def __init__(self, token):
         self.token = token  #Bearer + token
         self.accountStatus()
+
+    def requestHelp(self):
+        print("Displaying all valid commands:")
+        print("")
+        for command in COMMANDS:
+            print(command)
+        print("")
 
     def accountStatus(self):
         print("Loading account status...")
@@ -52,16 +66,16 @@ class SpaceTradersClientTerminal:
             r = requests.get("%s/my/loans" % URL, headers={'Authorization': self.token}, params=parameters)
 
         print("Loan sucessfully taken, here is the corresponding info:")
-        content = json.loads(r.content.decode())
-        print(content)
+        print(r.content.decode())
 
     def browseShips(self, system):
         print("Loading ship listings in " + system)
         r = requests.get("%s/systems/%s/ship-listings" % (URL, system), headers={'Authorization': self.token})
-        print("Here are all ships available for purchase, self.username")
+        print("Here are all ships available for purchase, " + self.username)
         content = json.loads(r.content.decode())
         for ship in content["shipListings"]:
             print(ship)
+            print("")
 
     def buyShip(self, location, type):
         parameters = {"location": location, "type": type}
@@ -75,6 +89,7 @@ class SpaceTradersClientTerminal:
             print("Purchase successfull, " + self.username)
             content = json.loads(r.content.decode())
             print(content)
+            #CONTENT NOT DISPLAYING PROPERLY
 
     def purchaseOrder(self, shipID, goodID, quantity):
         parameters = {"shipId": shipID, "good": goodID, "quantity":quantity}
@@ -125,7 +140,7 @@ print("Are you a registered member of the SpaceTraders? Y/N")
 registered = input("")
 print("")
 
-if registered == "N":
+if (registered == "N"):
     print("Commencing account creation protocol...")
     print("What would you like to be called?")
     username = input("")
@@ -150,7 +165,7 @@ if registered == "N":
     print("%s, your standard issue token is: %s" % (username, content["token"]))
     print("Please save this token in a safe external memory device, as losing it means termination of access to your account")
     print("")
-else: #Y
+elif (registered == "Y"): #Y
     print("Commencing user validation protocol...")
     print("Please insert your access token")
     token = "Bearer " + input("")
@@ -177,9 +192,11 @@ command = input("").split()
 print("")
 
 while (command[0] != 'EXIT'):
-    if (command == "HELP"):
-        print("I regret to inform that this terminal does not have a helpdesk module installed")
-    elif (command == ["BROWSE", "LOANS"]):          #BROWSE LOAN
+    if (command == ["HELP"]):
+        terminal.requestHelp()
+    elif (command == ["ACCOUNT", "INFO"]):          #ACCOUNT INFO
+        terminal.accountStatus()
+    elif (command == ["BROWSE", "LOANS"]):          #BROWSE LOANS
         terminal.browseLoans()
     elif (command[:2] == ["TAKE", "LOAN"]):         #TAKE LOAN $TYPE
         terminal.takeLoan(command[2])
@@ -191,7 +208,7 @@ while (command[0] != 'EXIT'):
         terminal.purchaseOrder(command[2], command[3], command[4])
     elif (command[:2] == ["BROWSE", "MARKET"]):     #BROWSE MARKET $LOCATION
         terminal.browseMarket(command[2])
-    elif (command[:2] == ["SCAN", "SYSTEM"]):           #SCAN SYSTEM $SYSTEM
+    elif (command[:2] == ["SCAN", "SYSTEM"]):       #SCAN SYSTEM $SYSTEM
         terminal.scanSystem(command[2])
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
