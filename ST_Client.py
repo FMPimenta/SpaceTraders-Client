@@ -100,7 +100,6 @@ class SpaceTradersClientTerminal:
             print("Purchase successfull, " + self.username)
             response = r.json()
             print(response)
-            # response NOT DISPLAYING PROPERLY
 
     def purchaseOrder(self, shipID, goodID, quantity):
         parameters = {"shipId": shipID, "good": goodID, "quantity": quantity}
@@ -219,22 +218,31 @@ while (command[0] != 'EXIT'):
 
     if (command == ["HELP"]):
         terminal.requestHelp()
-    elif (command == ["ACCOUNT", "INFO"]):  # ACCOUNT INFO
+    elif (command == ["ACCOUNT", "INFO"]):  
+        # ACCOUNT INFO
         terminal.accountStatus()
-    elif (command == ["BROWSE", "LOANS"]):  # BROWSE LOANS
+    elif (command == ["BROWSE", "LOANS"]):  
+        # BROWSE LOANS
         terminal.browseLoans()
-    elif (command[:2] == ["TAKE", "LOAN"]):  # TAKE LOAN $TYPE
+    elif (command[:2] == ["TAKE", "LOAN"]):  
+        # TAKE LOAN $TYPE
         terminal.takeLoan(command[2])
-    elif (command[:2] == ["BROWSE", "SHIPS"]):  # BROWSE SHIPS $SYSTEM
+    elif (command[:2] == ["BROWSE", "SHIPS"]):  
+        # BROWSE SHIPS $SYSTEM
         terminal.browseShips(command[2])
-    elif (command[:2] == ["BUY", "SHIP"]):  # BUY SHIP $LOCATION $TYPE
+    elif (command[:2] == ["BUY", "SHIP"]):  
+        # BUY SHIP $LOCATION $TYPE
         terminal.buyShip(command[2], command[3])
-    elif (command[:1] == ["PURCHASE"]):  # PURCHASE $SHIPID $GOODID $QUANTITY
-        terminal.purchaseOrder(command[2], command[3], command[4])
-    elif (command[:2] == ["BROWSE", "MARKET"]):  # BROWSE MARKET $LOCATION
+    elif (command[:2] == ["BROWSE", "MARKET"]):  
+        # BROWSE MARKET $LOCATION
         terminal.browseMarket(command[2])
-    elif (command[:2] == ["SCAN", "SYSTEM"]):  # SCAN SYSTEM $SYSTEM
+    elif (command[:1] == ["PURCHASE"]):  
+        # PURCHASE $SHIPID $GOODID $QUANTITY
+        terminal.purchaseOrder(command[2], command[3], command[4])
+    elif (command[:2] == ["SCAN", "SYSTEM"]):  
+        # SCAN SYSTEM $SYSTEM
         terminal.scanSystem(command[2])
+
 
     print("Insert your command: (EXIT to shutdown terminal and HELP for help)")
     command = input("").split()
